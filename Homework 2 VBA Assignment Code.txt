@@ -1,0 +1,94 @@
+Sub TickerStockAssignment()
+
+'Loop through all sheets
+
+For Each ws In Worksheets
+
+Dim WorksheetName As String
+
+WorksheetName = ws.Name
+
+'Setup table
+ws.Cells(1, 9).Value = "Ticker"
+ws.Cells(1, 10).Value = "Yearly Change"
+ws.Cells(1, 11).Value = "Percent Change"
+ws.Cells(1, 12).Value = "Total Stock Volume"
+
+'Set names
+Dim ticker_number As String
+Dim yearly_change As Double
+Dim percent_change As Double
+Dim stock_volume As Double
+stock_volume = 0
+
+Dim SummaryTable As Integer
+SummaryTable = 2
+
+Dim stock_open As Double
+Dim stock_close As Double
+stock_open = 0
+stock_close = 0
+
+'Determine the Last Row
+
+LastRow = ws.Cells(Rows.Count, 1).End(xlUp).Row
+
+For i = 2 To LastRow
+
+  If stock_open = 0 Then
+        stock_open = ws.Cells(i, 3).Value
+        
+End If
+
+    If ws.Cells(i + 1, 1).Value <> ws.Cells(i, 1).Value Then
+        ticker_number = ws.Cells(i, 1).Value
+        ws.Range("I" & SummaryTable).Value = ticker_number
+        
+        stock_close = ws.Cells(i, 6).Value
+        
+        yearly_change = stock_close - stock_open
+        ws.Range("J" & SummaryTable).Value = yearly_change
+            
+            If stock_close = 0 Then
+            ws.Range("K" & SummaryTable).Value = Null
+            
+            Else: percent_change = (stock_close - stock_open) / stock_open
+            ws.Range("K" & SummaryTable).Value = percent_change
+            
+            End If
+        
+        stock_volume = stock_volume + ws.Cells(i, 7).Value
+        ws.Range("L" & SummaryTable).Value = stock_volume
+    
+    SummaryTable = SummaryTable + 1
+    
+    stock_volume = 0
+    
+    stock_open = 0
+    
+    stock_close = 0
+   
+Else
+    stock_volume = stock_volume + ws.Cells(i, 7).Value
+
+End If
+
+Next i
+
+For i = 2 To LastRow
+
+ws.Cells(i, 11).NumberFormat = "0.00%"
+
+If ws.Cells(i, 10).Value > 0 Then
+ws.Cells(i, 10).Interior.ColorIndex = 4
+
+Else
+ws.Cells(i, 10).Interior.ColorIndex = 3
+
+End If
+
+Next i
+
+Next ws
+
+End Sub
